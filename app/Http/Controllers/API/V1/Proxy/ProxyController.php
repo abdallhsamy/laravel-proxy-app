@@ -20,6 +20,7 @@ class ProxyController
             'config' => 'sometimes|array',
             'headers' => 'sometimes|array',
             'cookies' => 'nullable',
+            'url_encoded' => 'nullable|boolean',
         ]);
 
         $url = $request->get('url');
@@ -36,6 +37,11 @@ class ProxyController
         if ($method === 'get') {
             $res =  $response->get(url: $url, query: $query);
         }elseif (in_array($method, ['post', 'put', 'patch', 'delete'])) {
+
+            // Hotfix of urlencoded form data
+            if(request()->url_encoded == true)
+                $res = $response->asForm();
+            
             $res = $response->$method(url: $url, data: $body);
         }
 
